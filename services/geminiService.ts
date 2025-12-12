@@ -24,11 +24,14 @@ const getSystemInstruction = (feature: FeatureId, tone?: ToneType): string => {
 };
 
 export const generateContent = async (
-  apiKey: string,
   request: GenerationRequest
 ): Promise<string> => {
+  // API Key must be configured in environment variables (e.g. Vercel env vars)
+  // as process.env.API_KEY
+  const apiKey = process.env.API_KEY;
+
   if (!apiKey) {
-    throw new Error("API Key is missing. Please set it in Settings.");
+    throw new Error("API Key is missing. Please configure 'API_KEY' in your environment variables.");
   }
 
   const ai = new GoogleGenAI({ apiKey });

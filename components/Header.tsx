@@ -1,16 +1,14 @@
 import React from 'react';
-import { PenLine, Settings, Moon, Sun, History } from 'lucide-react';
+import { PenLine, Moon, Sun, History } from 'lucide-react';
 import { Button } from './Button';
 
 interface HeaderProps {
-  onOpenSettings: () => void;
   onToggleHistory: () => void;
   isDark: boolean;
   toggleTheme: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
-  onOpenSettings, 
   onToggleHistory,
   isDark, 
   toggleTheme 
@@ -23,9 +21,12 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="bg-gradient-to-br from-primary-500 to-indigo-600 p-2 rounded-lg">
               <PenLine className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-              Lumina Writer
-            </h1>
+            <div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent leading-none">
+                Lumina Writer
+              </h1>
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium tracking-wide">AI WRITING ASSISTANT</p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -38,9 +39,6 @@ export const Header: React.FC<HeaderProps> = ({
             </Button>
              <Button variant="ghost" size="sm" onClick={onToggleHistory} className="sm:hidden" aria-label="History">
               <History className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onOpenSettings} aria-label="Settings">
-              <Settings className="h-5 w-5" />
             </Button>
           </div>
         </div>

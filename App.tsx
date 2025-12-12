@@ -3,7 +3,6 @@ import { Toaster, toast } from 'react-hot-toast';
 import ReactMarkdown from 'react-markdown';
 import { 
   Copy, 
-  RotateCcw, 
   Sparkles, 
   Volume2, 
   Eraser,
@@ -15,23 +14,16 @@ import { Header } from './components/Header';
 import { FeatureSelector } from './components/FeatureSelector';
 import { Button } from './components/Button';
 import { HistoryPanel } from './components/HistoryPanel';
-import { SettingsModal } from './components/SettingsModal';
 
 // Logic
 import { generateContent } from './services/geminiService';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { FeatureId, ToneType, HistoryItem } from './types';
 
-// Constants
-const DEFAULT_API_KEY = process.env.VITE_GEMINI_API_KEY || ''; // Fallback to env
-
 function App() {
   // --- State ---
   // Theme state
   const [isDark, setIsDark] = useLocalStorage<boolean>('lumina-theme-dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
-  // Settings state
-  const [apiKey, setApiKey] = useLocalStorage<string>('lumina-api-key', DEFAULT_API_KEY);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   
   // App Logic State
@@ -53,17 +45,6 @@ function App() {
     }
   }, [isDark]);
 
-  // If no API key is present on mount, open settings
-  useEffect(() => {
-    if (!apiKey && !process.env.VITE_GEMINI_API_KEY) {
-      // Small delay to allow render
-      setTimeout(() => {
-        toast('Please set your API Key to start', { icon: '🔑' });
-        setIsSettingsOpen(true);
-      }, 1000);
-    }
-  }, [apiKey]);
-
   // --- Handlers ---
   
   const handleProcess = async () => {
@@ -72,17 +53,11 @@ function App() {
       return;
     }
 
-    if (!apiKey) {
-      setIsSettingsOpen(true);
-      toast.error('API Key is required');
-      return;
-    }
-
     setIsLoading(true);
     setResultText(''); // Clear previous result
 
     try {
-      const generatedText = await generateContent(apiKey, {
+      const generatedText = await generateContent({
         feature: selectedFeature,
         text: inputText,
         tone: selectedFeature === FeatureId.TONE ? selectedTone : undefined
@@ -145,6 +120,16 @@ function App() {
   const wordCount = inputText.trim() ? inputText.trim().split(/\s+/).length : 0;
   const charCount = inputText.length;
 
+  const featureDescriptions: Record<FeatureId, string> = {
+    [FeatureId.TRANSLATE]: "Translate text between English and Burmese with high accuracy.",
+    [FeatureId.GRAMMAR]: "Correct grammar, spelling, and punctuation errors instantly.",
+    [FeatureId.SIMPLIFY]: "Simplify complex text to make it easier to understand.",
+    [FeatureId.EXPAND]: "Expand short ideas into detailed, well-structured paragraphs.",
+    [FeatureId.TONE]: "Adjust the tone of your writing to match your audience.",
+    [FeatureId.GENERATE]: "Generate creative content based on topics or keywords.",
+    [FeatureId.SUMMARY]: "Summarize long text into concise key points."
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col font-sans transition-colors duration-200">
       <Toaster position="bottom-right" />
@@ -152,7 +137,6 @@ function App() {
       <Header 
         isDark={isDark} 
         toggleTheme={() => setIsDark(!isDark)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
         onToggleHistory={() => setIsHistoryOpen(true)}
       />
 
@@ -161,7 +145,10 @@ function App() {
         {/* Left Column: Inputs */}
         <div className="flex-1 flex flex-col space-y-6">
           <section>
-            <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Select Feature</h2>
+            <div className="mb-3">
+              <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Select Feature</h2>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 font-medium">{featureDescriptions[selectedFeature]}</p>
+            </div>
             <FeatureSelector 
               selected={selectedFeature} 
               onSelect={setSelectedFeature} 
@@ -292,13 +279,6 @@ function App() {
         onClear={() => {
           if(confirm('Are you sure you want to clear history?')) setHistory([]);
         }}
-      />
-
-      <SettingsModal 
-        isOpen={isSettingsOpen} 
-        onClose={() => setIsSettingsOpen(false)}
-        apiKey={apiKey}
-        onSave={setApiKey}
       />
     </div>
   );
