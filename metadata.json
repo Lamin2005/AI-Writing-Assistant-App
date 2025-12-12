@@ -1,0 +1,5 @@
+{
+  "name": "Lumina AI Writer",
+  "description": "A powerful AI-powered writing assistant supporting translation, grammar correction, simplification, and content generation using Google Gemini.",
+  "requestFramePermissions": []
+}
