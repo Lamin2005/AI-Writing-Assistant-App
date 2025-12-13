@@ -28,7 +28,7 @@ export const generateContent = async (
 ): Promise<string> => {
   // API Key must be configured in environment variables (e.g. Vercel env vars)
   // as process.env.API_KEY
-  const apiKey = process.env.API_KEY;
+  const apiKey = import.meta.env.VITE_API_KEY;
 
   if (!apiKey) {
     throw new Error("API Key is missing. Please configure 'API_KEY' in your environment variables.");
